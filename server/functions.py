@@ -17,10 +17,19 @@ def startServer():
 def handle(connection):
     pass
 
-#As funções abaixo trata especificamente do envio de dados entre a EC2 do consumer e a EC2 do jogo
-def send_data(data, IP_EC2):
-    serialized_data = json.dumps(data)
-    client_socket = sk.socket(sk.AF_INET, sk.SOCK_STREAM)
-    client_socket.connect((IP_EC2, 5000))
-    client_socket.send(serialized_data.encode())
-    client_socket.close()
+#As funções abaixo trata especificamente do consumo de dados entre enviados pela EC2 do producer
+def receive():
+    server_socket = sk.socket(sk.AF_INET, sk.SOCK_STREAM)
+    server_socket.bind(('0.0.0.0', 5000))  
+    server_socket.listen(1)
+
+    print("Servidor aguardando conexão...")
+    conn, addr = server_socket.accept()
+    print(f"Conexão estabelecida com {addr}")
+
+    data = conn.recv(1024).decode()
+    dicionario = json.loads(data)
+    print("Dados recebidos:", dicionario)
+
+    conn.close()
+    server_socket.close()
